@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="World SLAM Model: Joint World Modeling for SLAM and Navigation">
+  <meta name="keywords" content="World SLAM Model, WSM, SLAM, Navigation, World Model, Embodied AI">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>World SLAM Model: Joint World Modeling for SLAM and Navigation</title>
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+</head>
+<body>
+  <section class="hero publication-hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="hero-copy has-text-centered">
+          <h1 class="publication-title">
+            <span class="title-main">World SLAM Model</span>
+            <span class="title-sub">Joint World Modeling for SLAM and Navigation</span>
+          </h1>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">Minghui Qin<sup>1,3*</sup>,</span>
+            <span class="author-block">Yijun Yuan<sup>2*&dagger;</sup>,</span>
+            <span class="author-block">Weicheng Zheng<sup>2</sup>,</span>
+            <span class="author-block">Kenan Li<sup>2</sup>,</span>
+            <span class="author-block">Weibang Wang<sup>2</sup>,</span>
+            <span class="author-block">Chang Sun<sup>2</sup>,</span>
+            <span class="author-block">Junhao Huang<sup>2</sup>,</span>
+            <span class="author-block">Anmin Liu<sup>2</sup>,</span>
+            <span class="author-block">Yicheng Yao<sup>2</sup>,</span>
+            <span class="author-block">Hang Zhao<sup>1,2&dagger;</sup></span>
+          </div>
+
+          <div class="is-size-5 publication-affiliations">
+            <span class="author-block"><sup>1</sup>Shanghai Qi Zhi Institute</span>
+            <span class="author-block"><sup>2</sup>IIIS, Tsinghua University</span>
+            <span class="author-block"><sup>3</sup>Shanghai Jiao Tong University</span>
+          </div>
+
+          <div class="publication-notes">
+            <span class="author-block"><sup>*</sup>Equal contribution</span>
+            <span class="author-block"><sup>&dagger;</sup>Corresponding author</span>
+          </div>
+
+          <div class="publication-links">
+            <span class="link-block">
+              <a href="https://arxiv.org/abs/2609.32626" target="_blank" rel="noopener" class="button is-rounded">
+                <img class="button-icon" src="./static/images/arxiv.svg" alt="">
+                <span>arXiv</span>
+              </a>
+            </span>
+            <span class="link-block">
+              <a href="https://github.com/Tsinghua-MARS-Lab/WorldSLAMModel" target="_blank" rel="noopener" class="button is-rounded">
+                <img class="button-icon button-icon-invert" src="./static/images/github.svg" alt="">
+                <span>Code</span>
+              </a>
+            </span>
+            <span class="link-block">
+              <a href="#bibtex" class="button is-rounded">
+                <img class="button-icon button-icon-invert" src="./static/images/bibtex.svg" alt="">
+                <span>BibTeX</span>
+              </a>
+            </span>
+          </div>
+
+          <div class="tldr-card">
+            <p class="tldr-badge">TL;DR</p>
+            <p class="tldr-text">
+              WSM brings the SLAM mechanism itself, rather than only its outputs, into navigation: the generation expert
+              dreams goal-conditioned futures, and the SLAM expert estimates world states from both observed and dreamed
+              frames, maintaining one persistent world state from RGB input alone. Incorporating SLAM into the learning
+              process benefits both training and inference, rather than merely providing its outputs to the model at
+              inference time. WSM thereby closes the perception&ndash;action loop within a single world model.
+            </p>
+          </div>
+        </div>
+
+        <div class="hero-figure">
+          <figure class="image frame-card">
+            <img src="./static/images/fig1_overview.png" alt="Overview of the World SLAM Model.">
+          </figure>
+          <p class="caption has-text-centered">
+            A SLAM expert and a generation expert in one autoregressive model, supporting navigation, localization, and
+            mapping.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="abstract">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 section-title">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              We introduce <strong>World SLAM Model (WSM)</strong>, a unified framework that brings the SLAM paradigm
+              directly into downstream navigation. Rather than treating SLAM merely as an upstream module that provides
+              poses, maps or tokens, WSM adopts its core mechanisms, including incremental state updates with persistent
+              memory and backend refinement of accumulated errors, to maintain a consistent world state during
+              interaction. Given the current observation and a navigation goal, WSM predicts future visual states and
+              jointly estimates their camera motion and dense geometry, grounding visual prediction in an evolving
+              spatial world state. This spatial state is continuously updated as new observations arrive and provides
+              the basis for action generation and closed-loop navigation. WSM is trained end-to-end with a joint
+              navigation&ndash;SLAM objective, enabling downstream navigation to benefit directly from SLAM-style state
+              maintenance and refinement while preserving accurate geometric estimation. Experiments demonstrate
+              improved navigation performance together with strong SLAM accuracy, highlighting the potential of SLAM as
+              an intrinsic mechanism for long-horizon world modeling and embodied interaction.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="method">
+    <div class="container is-max-desktop">
+      <figure class="image frame-card frame-card-plain">
+        <img src="./static/images/fig2_framework.png" alt="Framework overview of the World SLAM Model.">
+      </figure>
+      <p class="caption has-text-centered">
+        Our model unifies visual dreaming and SLAM within an autoregressive Mixture-of-Transformers (MoT) for
+        start&ndash;goal navigation.
+      </p>
+
+      <figure class="image frame-card frame-card-plain method-second-figure">
+        <img src="./static/images/fig3_attention_mask.png" alt="Training sequence and attention mask.">
+      </figure>
+      <p class="caption has-text-centered">
+        All chunks of an episode are trained in one forward pass. No prediction token attends to its own target.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="results">
+    <div class="container is-max-desktop">
+      <div class="content">
+        <p>
+          On the InternVLA-N1 start&ndash;goal benchmark, WSM uses RGB only and achieves the best SR and SPL in both Home and
+          Commercial scenes among the evaluated methods.
+        </p>
+      </div>
+
+      <div class="table-block">
+        <div class="table-wrapper">
+          <table class="results-table">
+            <thead>
+              <tr>
+                <th rowspan="2">Method</th>
+                <th rowspan="2">RGB</th>
+                <th rowspan="2">Depth</th>
+                <th colspan="2">Home</th>
+                <th colspan="2">Commercial</th>
+              </tr>
+              <tr>
+                <th>SR&uarr;</th><th>SPL&uarr;</th>
+                <th>SR&uarr;</th><th>SPL&uarr;</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="group-row"><td colspan="7">Reported by LoGoPlanner</td></tr>
+              <tr><td>DD-PPO</td><td>&#10003;</td><td>&#10003;</td><td>0.4</td><td>0.4</td><td>5.3</td><td>5.2</td></tr>
+              <tr><td>iPlanner</td><td>&ndash;</td><td>&#10003;</td><td>43.0</td><td>40.6</td><td>54.6</td><td>52.8</td></tr>
+              <tr><td>ViPlanner</td><td>&#10003;</td><td>&#10003;</td><td>45.0</td><td>43.2</td><td>63.7</td><td>61.9</td></tr>
+              <tr><td>LoGoPlanner</td><td>&#10003;</td><td>&#10003;</td><td>57.3</td><td>52.4</td><td>67.1</td><td>63.9</td></tr>
+              <tr class="group-row"><td colspan="7">Our evaluation</td></tr>
+              <tr><td>LoGoPlanner<sup>&dagger;</sup></td><td>&#10003;</td><td>&#10003;</td><td>59.6</td><td>53.6</td><td>65.8</td><td>62.0</td></tr>
+              <tr class="ours-row"><td>World SLAM Model (Ours)</td><td>&#10003;</td><td>&ndash;</td><td>70.3</td><td>66.3</td><td>73.9</td><td>71.8</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="caption">
+          SR and SPL in %. <sup>&dagger;</sup>Re-evaluated with the latest official code.
+        </p>
+      </div>
+
+      <div class="result-gap"></div>
+      <div class="buttons is-centered result-tabs">
+        <button class="button is-rounded is-active" data-src="./static/images/home_02_ep026.png">Episode 1</button>
+        <button class="button is-rounded" data-src="./static/images/home_03_ep043.png">Episode 2</button>
+        <button class="button is-rounded" data-src="./static/images/home_09_ep037.png">Episode 3</button>
+        <button class="button is-rounded" data-src="./static/images/home_11_ep024.png">Episode 4</button>
+        <button class="button is-rounded" data-src="./static/images/home_12_ep067.png">Episode 5</button>
+      </div>
+      <figure class="image frame-card frame-card-plain">
+        <img id="result-image" src="./static/images/home_02_ep026.png" alt="Visualization of navigation results in simulation.">
+      </figure>
+      <p class="caption has-text-centered">
+        (a) Navigation result. (b) Observation and dreamed frames at Q1&ndash;Q3. (c) Estimated vs. GT trajectory.
+        (d) GT vs. predicted depth.
+      </p>
+    </div>
+  </section>
+
+  <section class="section" id="bibtex">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 section-title">BibTeX</h2>
+      <pre><code>@article{qin2026wsm,
+  title   = {World SLAM Model: Joint World Modeling for SLAM and Navigation},
+  author  = {Minghui Qin and Yijun Yuan and Weicheng Zheng and Kenan Li and Weibang Wang and
+             Chang Sun and Junhao Huang and Anmin Liu and Yicheng Yao and Hang Zhao},
+  journal = {arXiv preprint arXiv:2609.32626},
+  year    = {2026},
+  url     = {https://arxiv.org/abs/2609.32626}
+}</code></pre>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="content has-text-centered">
+        <p>
+          Website template adapted from <a href="https://github.com/nerfies/nerfies.github.io">Nerfies</a>,
+          licensed under <a href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a>.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="./static/js/index.js"></script>
+</body>
+</html>
